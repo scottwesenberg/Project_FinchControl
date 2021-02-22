@@ -9,7 +9,7 @@ namespace FinchTalentShow
     // **************************************************
     //
     // Title: Finch Control Project
-    // Description: Finch control menu with several options.
+    // Description: Finch control menu with options to create a talent show.
     // Application Type: Console
     // Author: Wesenberg, Scott
     // Dated Created: 2/15/2021
@@ -124,7 +124,7 @@ namespace FinchTalentShow
                 DisplayScreenHeader("Talent Show Menu");
 
                 //
-                // get user menu choice
+                // get menu choice
                 //
                 Console.WriteLine("\ta) Light and Sound");
                 Console.WriteLine("\tb) Dance");
@@ -133,9 +133,7 @@ namespace FinchTalentShow
                 Console.Write("\t\tEnter Choice:");
                 menuChoice = Console.ReadLine().ToLower();
 
-                //
-                // process user menu choice
-                //
+
                 switch (menuChoice)
                 {
                     case "a":
@@ -308,8 +306,7 @@ namespace FinchTalentShow
         /// *                  Connect Finch Robot                      *
         /// *************************************************************
         /// 
-        /// <param name="finchRobot">finch robot object</param>
-        /// <returns>notify if the robot is connected</returns>
+
         static bool DisplayConnectFinchRobot(Finch finchRobot)
         {
             Console.CursorVisible = false;
@@ -326,9 +323,7 @@ namespace FinchTalentShow
 
             DisplayMenuPrompt("Main Menu");
 
-            //
-            // reset finch robot
-            //
+ 
             finchRobot.setLED(0, 0, 0);
             finchRobot.noteOff();
 
@@ -371,9 +366,6 @@ namespace FinchTalentShow
             DisplayContinuePrompt();
         }
 
-        ///
-        /// display continue prompt
-        ///
         static void DisplayContinuePrompt()
         {
             Console.WriteLine();
@@ -381,9 +373,7 @@ namespace FinchTalentShow
             Console.ReadKey();
         }
 
-        /// 
-        /// display menu prompt
-        /// 
+
         static void DisplayMenuPrompt(string menuName)
         {
             Console.WriteLine();
@@ -391,9 +381,7 @@ namespace FinchTalentShow
             Console.ReadKey();
         }
 
-        ///
-        /// display screen header
-        /// 
+
         static void DisplayScreenHeader(string headerText)
         {
             Console.Clear();
