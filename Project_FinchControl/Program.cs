@@ -9,7 +9,7 @@ namespace FinchTalentShow
     // **************************************************
     //
     // Title: Finch Control Project
-    // Description: Finch control menu with options to create a talent show.
+    // Description: Finch control menu with options to create a talent show and a data recorder.
     // Application Type: Console
     // Author: Wesenberg, Scott
     // Dated Created: 2/15/2021
@@ -19,7 +19,7 @@ namespace FinchTalentShow
 
     class Program
     {
-
+        #region SET THEME
         static void Main(string[] args)
         {
             SetTheme();
@@ -35,7 +35,8 @@ namespace FinchTalentShow
             Console.ForegroundColor = ConsoleColor.White;
             Console.BackgroundColor = ConsoleColor.DarkCyan;
         }
-
+        #endregion
+        #region MAIN MENU
         /// 
         /// *****************************************************************
         /// *                     Main Menu                                 *
@@ -77,7 +78,7 @@ namespace FinchTalentShow
                         break;
 
                     case "c":
-
+                        DataRecorderDisplayMenuScreen(finchRobot);
                         break;
 
                     case "d":
@@ -106,6 +107,8 @@ namespace FinchTalentShow
 
             } while (!quitApplication);
         }
+#endregion
+        #region TALENT SHOW 
 
         ///
         /// ******************************************************
@@ -279,7 +282,221 @@ namespace FinchTalentShow
         }
 
 
+        #endregion
+        #region DATA RECORDER
 
+        static void DataRecorderDisplayMenuScreen(Finch finchRobot)
+        {
+            int numberOfDataPoints = 0;
+            double dataPointFrequency = 0;
+            double[] temperatures = null;
+
+
+            Console.CursorVisible = true;
+
+            bool quitMenu = false;
+            string menuChoice;
+
+            do
+            {
+                DisplayScreenHeader("Data Recorder Menu");
+
+                //
+                // get menu choice
+                //
+                Console.WriteLine("\ta) Number of Data Points");
+                Console.WriteLine("\tb) Frequency of Data Points");
+                Console.WriteLine("\tc) Get Data");
+                Console.WriteLine("\td) Show Data");
+                Console.WriteLine("\tq) Main Menu");
+                Console.Write("\t\tEnter Choice:");
+                menuChoice = Console.ReadLine().ToLower();
+
+
+                switch (menuChoice)
+                {
+                    case "a":
+                        numberOfDataPoints = DataRecoredDisplayGetNumberOfDataPoints();
+                        break;
+
+                    case "b":
+                        dataPointFrequency = DataRecorderDisplayGetDataPointFrequency();
+                        break;
+
+                    case "c":
+                        temperatures = DataRecorderDisplayGetData(numberOfDataPoints, dataPointFrequency, finchRobot);
+                        break;
+                    case "d":
+                        DataRecorderDisplayGetData(temperatures);
+                        break;
+
+                    case "q":
+                        quitMenu = true;
+                        break;
+
+                    default:
+                        Console.WriteLine();
+                        Console.WriteLine("\tPlease enter a letter for the menu choice.");
+                        DisplayContinuePrompt();
+                        break;
+                }
+
+            } while (!quitMenu);
+
+
+        }
+
+        static void DataRecorderDisplayGetData(double[] temperatures)
+        {
+            DisplayScreenHeader("Show Data");
+
+            DataRecorderDisplayTable(temperatures);
+
+
+            DisplayContinuePrompt();
+        }
+
+        static void DataRecorderDisplayTable(double[] temperatures)
+        {
+
+                //
+                //diplsay table headers
+                //
+                Console.WriteLine(
+                            "Recording #".PadLeft(15) +
+                            "Temp".PadLeft(15)
+                            );
+                Console.WriteLine(
+                    "----------".PadLeft(15) +
+                    "----------".PadLeft(15)
+                    );
+                //
+                //display table data
+                //
+                for (int i = 0; i < temperatures.Length; i++)
+                {
+
+                    Console.WriteLine(
+                        (i + 1).ToString().PadLeft(15) +
+                        temperatures[i].ToString("n2").PadLeft(15)
+                );
+                }
+
+            }
+
+            static double[] DataRecorderDisplayGetData(int numberOfDataPoints, double dataPointFrequency, Finch finchRobot)
+        {
+            double[] temperatures = new double[numberOfDataPoints];
+
+            DisplayScreenHeader("Get Data");
+
+            Console.WriteLine($"Number of Data Points: {numberOfDataPoints}");
+            Console.WriteLine($"Data Point Frequency: {dataPointFrequency}");
+            Console.WriteLine();
+            Console.WriteLine("\tThe finch robot is ready to begin recording the temperature data.");
+            DisplayContinuePrompt();
+
+            for (int i = 0; i < numberOfDataPoints; i++)
+            {
+                temperatures[i] = finchRobot.getTemperature();
+                Console.WriteLine($"\tReading {i + 1}: {temperatures[i].ToString("n2")}");
+                int waitInSeconds = (int)(dataPointFrequency * 1000);
+                finchRobot.wait(waitInSeconds);
+
+            }
+
+            DisplayContinuePrompt();
+            return temperatures;
+
+        }
+
+        /// <summary>
+        /// get frequency of data points from the user
+        /// </summary>
+        /// <returns>frequency of data points</returns>
+        static double DataRecorderDisplayGetDataPointFrequency()
+        {
+            double dataPointFrequency;
+            bool validResponse = false;
+
+            DisplayScreenHeader("Data Point Frequency");
+
+
+
+            //validate user input
+            do
+            {
+                Console.Write("\tFrequency of Data Points:");
+
+                if (double.TryParse(Console.ReadLine(), out dataPointFrequency))
+                {
+                    if (dataPointFrequency <= 0)
+                    {
+                        Console.WriteLine("\tPlease enter a number for frequency.");
+                    }
+                    else
+                    {
+                        validResponse = true;
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("\t\tIt appears you did not provide a number");
+                }
+            } while (!validResponse);
+
+            return dataPointFrequency;
+        }
+
+        /// <summary>
+        /// get number of data points from user
+        /// </summary>
+        /// <returns>number of date points</returns>
+        static int DataRecoredDisplayGetNumberOfDataPoints()
+        {
+            int numberOfDataPoints;
+            bool validResponse = false;
+
+            DisplayScreenHeader("Number of Data Points");
+            do
+            {
+
+                string userResponse;
+
+
+                Console.Write("\tNumber of Data Points:");
+                userResponse = Console.ReadLine();
+
+                if (int.TryParse(userResponse, out numberOfDataPoints))
+                {
+                    if (numberOfDataPoints <= 0)
+                    {
+
+                        Console.WriteLine("\tPlease enter an integer.");
+
+                    }
+                    else
+                    {
+                        validResponse = true;
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("\t\tIt appears you did not enter an integer.");
+                }
+
+
+            } while (!validResponse);
+
+         
+            //validate user input
+           
+
+            return numberOfDataPoints;
+        }
+
+        #endregion
+        #region ROBOT MANAGEMENT
         /// 
         /// ********************************************************
         /// *               Disconnect Finch Robot                 *
@@ -330,8 +547,8 @@ namespace FinchTalentShow
             return robotConnected;
         }
 
-
-
+        #endregion
+        #region INTERFACE
         ///
         /// *****************************************************************
         /// *                     Welcome Screen                            *
@@ -389,6 +606,6 @@ namespace FinchTalentShow
             Console.WriteLine("\t\t" + headerText);
             Console.WriteLine();
         }
-
+        #endregion
     }
 }
