@@ -44,7 +44,7 @@ namespace FinchTalentShow
         #region SET THEME
         static void Main(string[] args)
         {
-            DisplaySetTheme();
+          
 
             DisplayWelcomeScreen();
             DisplayMenuScreen();
@@ -84,7 +84,7 @@ namespace FinchTalentShow
                 Console.WriteLine("\td) Alarm System");
                 Console.WriteLine("\te) User Programming");
                 Console.WriteLine("\tf) Disconnect Finch Robot");
-                Console.WriteLine("\tg) Change Application Theme");
+                Console.WriteLine("\tg) Change Applications Theme");
                 Console.WriteLine("\tq) Quit");
                 Console.Write("\t\tEnter Choice:");
                 menuChoice = Console.ReadLine().ToLower();
