@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using FinchAPI;
 
+
 namespace FinchTalentShow
 {
 
@@ -35,12 +36,15 @@ namespace FinchTalentShow
 
     class Program
     {
+        
+
+
 
 
         #region SET THEME
         static void Main(string[] args)
         {
-            SetTheme();
+            DisplaySetTheme();
 
             DisplayWelcomeScreen();
             DisplayMenuScreen();
@@ -48,11 +52,11 @@ namespace FinchTalentShow
         }
 
 
-        static void SetTheme()
-        {
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.BackgroundColor = ConsoleColor.DarkCyan;
-        }
+        //static void SetTheme()
+        //{
+        //    Console.ForegroundColor = ConsoleColor.White;
+        //    Console.BackgroundColor = ConsoleColor.DarkCyan;
+        //}
         #endregion
         #region MAIN MENU
         /// 
@@ -80,6 +84,7 @@ namespace FinchTalentShow
                 Console.WriteLine("\td) Alarm System");
                 Console.WriteLine("\te) User Programming");
                 Console.WriteLine("\tf) Disconnect Finch Robot");
+                Console.WriteLine("\tg) Change Application Theme");
                 Console.WriteLine("\tq) Quit");
                 Console.Write("\t\tEnter Choice:");
                 menuChoice = Console.ReadLine().ToLower();
@@ -109,6 +114,10 @@ namespace FinchTalentShow
 
                     case "f":
                         DisplayDisconnectFinchRobot(finchRobot);
+                        break;
+
+                    case "g":
+                        DisplaySetTheme();
                         break;
 
                     case "q":
@@ -1133,6 +1142,163 @@ static int LightAlarmSetMinMaxThresholdValue(string rangeType, Finch finchRobot)
         }
 
         #endregion
+#region SET THEME
+
+
+        static void DisplaySetTheme()
+        {
+            (ConsoleColor foregroundColor, ConsoleColor backgroundColor) themeColors;
+            bool themeChosen = false;
+
+            themeColors = ReadThemeData();
+
+            Console.ForegroundColor = themeColors.foregroundColor;
+            Console.BackgroundColor = themeColors.backgroundColor;
+            Console.Clear();
+
+            DisplayScreenHeader("Set Theme for Application");
+
+            Console.WriteLine($"\tCurrent foreground color: {Console.ForegroundColor}");
+            Console.WriteLine($"\tCurrent background color: {Console.BackgroundColor}");
+            Console.WriteLine();
+            Console.WriteLine("Would you like to change the current theme of the application? [yes | no]");
+            if (Console.ReadLine().ToLower() == "yes")
+            {
+                do
+                {
+                    themeColors.foregroundColor = GetConsoleColorFromUser("foreground");
+                    themeColors.backgroundColor = GetConsoleColorFromUser("background");
+
+                    Console.ForegroundColor = themeColors.foregroundColor;
+                    Console.BackgroundColor = themeColors.backgroundColor;
+                    Console.Clear();
+
+                    DisplayScreenHeader("Set Theme for Application");
+                    Console.WriteLine($"\tNew foreground color: {Console.ForegroundColor}");
+                    Console.WriteLine($"\tNew background color: {Console.BackgroundColor}");
+                    Console.WriteLine();
+
+                    Console.Write("\tIs this the theme you would like to use?");
+                    if (Console.ReadLine().ToLower() == "yes")
+                    {
+                        themeChosen = true;
+                        WriteThemeData(themeColors.foregroundColor, themeColors.backgroundColor);
+
+                    }
+                } while (!themeChosen);
+
+            }
+
+            DisplayContinuePrompt();
+
+        }
+
+        static ConsoleColor GetConsoleColorFromUser(string property)
+        {
+            ConsoleColor consoleColor;
+            bool validConsoleColor;
+
+            do
+            {
+                Console.Write($"Enter a value for the {property}:");
+                validConsoleColor = Enum.TryParse<ConsoleColor>(Console.ReadLine(), true, out consoleColor);
+
+                if (!validConsoleColor)
+                {
+                    Console.WriteLine("\n\tPlease try again. Enter a valid console color.");
+                }
+                else
+                {
+                    validConsoleColor = true;
+                }
+            } while (!validConsoleColor);
+
+            return consoleColor;
+        }
+
+        static (ConsoleColor foregroundColor, ConsoleColor backgroundColor) ReadThemeData()
+        {
+            string dataPath = @"Data/Theme.txt";
+            string[] themeColors;
+
+            ConsoleColor foregroundColor;
+            ConsoleColor backgroundColor;
+
+            themeColors = File.ReadAllLines(dataPath);
+
+            Enum.TryParse(themeColors[0], true, out foregroundColor);
+
+            Enum.TryParse(themeColors[1], true, out backgroundColor);
+
+            return (foregroundColor, backgroundColor);
+
+        }
+
+        static void WriteThemeData(ConsoleColor foreground, ConsoleColor background)
+        {
+            string dataPath = @"Data/Theme.txt";
+
+            File.WriteAllText(dataPath, foreground.ToString() + "\n");
+            File.WriteAllText(dataPath, background.ToString());
+        }
+        
+        static (ConsoleColor foregroundColor, ConsoleColor backgroundColor) ReadThemeDataExceptions(out string fileIOStatusMessage)
+        {
+            string dataPath = @"Data/Theme.txt";
+            string[] themeColors;
+
+            ConsoleColor foregroundColor = ConsoleColor.White;
+            ConsoleColor backgroundColor = ConsoleColor.Black;
+
+            try
+            {
+                themeColors = File.ReadAllLines(dataPath);
+                if (Enum.TryParse(themeColors[0], true, out foregroundColor) &&
+                    Enum.TryParse(themeColors[1], true, out backgroundColor))
+                {
+                    fileIOStatusMessage = "Complete";
+                }
+
+                else
+                {
+                    fileIOStatusMessage = "Data file was not formatted correctly.";
+                }
+            }
+            catch(DirectoryNotFoundException)
+            {
+                fileIOStatusMessage = "Unable to locate folder for the data file.";
+            }
+            catch (Exception)
+            {
+                fileIOStatusMessage = "Unable to read the data file.";
+            }
+            return (foregroundColor, backgroundColor);
+        }
+        static string WriteThemeDataExceptions(ConsoleColor foreground, ConsoleColor background)
+        {
+            string dataPath = @"Data/Theme.txt";
+            string  FileIOStatusMessage = "";
+
+            try
+            {
+                File.WriteAllText(dataPath, foreground.ToString() + "\n");
+                File.AppendAllText(dataPath, background.ToString());
+                FileIOStatusMessage = "Complete";
+
+            }
+
+            catch(DirectoryNotFoundException)
+            {
+                FileIOStatusMessage = "Unable to to locate the folder for the data file.";
+            }
+            catch(Exception)
+            {
+                FileIOStatusMessage = "Unable to write to data file.";
+            }
+            return FileIOStatusMessage;
+        }
+
+        #endregion
         #region INTERFACE
         ///
         /// *****************************************************************
@@ -1194,3 +1360,4 @@ static int LightAlarmSetMinMaxThresholdValue(string rangeType, Finch finchRobot)
         #endregion
     }
 }
+
